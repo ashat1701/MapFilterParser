@@ -2,7 +2,9 @@ enum class NodeType {
     OPERATOR, NUMBER, MAP, FILTER, ELEMENT, UNKNOWN
 }
 enum class ErrorType {
-    UNKNOWN_CALL, ERROR, MISSING_BRACKET, EXPECTED_OPERATOR, EXPECTED_NUMBER, SEQ_ERROR, EXPECTED_EXPRESSION
+    UNKNOWN_CALL, ERROR, MISSING_BRACKET, EXPECTED_OPERATOR,
+    EXPECTED_NUMBER, SEQ_ERROR, EXPECTED_EXPRESSION, EXPECTED_BOOLEAN,
+    EXPECTED_NUMERIC
 }
 val TOKENS = mapOf(
     NodeType.MAP to "map",
@@ -44,18 +46,17 @@ data class ASTNode(
             return TOKENS[type]!!
         }
         if (type == NodeType.OPERATOR) {
-            var result = ""
-            var isBrackedNeeded = false
+            var isBracketNeeded = false
             if (parent != null && parent!!.type == NodeType.OPERATOR ) {
                 result += "("
-                isBrackedNeeded = true
+                isBracketNeeded = true
             }
             for (child in children) {
                 result += child.toString()
                 result += value
             }
             result = result.dropLast(1)
-            if (isBrackedNeeded)
+            if (isBracketNeeded)
                 result += ")"
             return result
         }
@@ -74,6 +75,8 @@ fun printError(e:ErrorType, state: ParserState) {
         ErrorType.EXPECTED_OPERATOR -> println("Invalid operator")
         ErrorType.EXPECTED_EXPRESSION -> println("Expected expression")
         ErrorType.SEQ_ERROR -> println("Couldn't split into calls")
+        ErrorType.EXPECTED_BOOLEAN -> println("Type error: Expected boolean type")
+        ErrorType.EXPECTED_NUMERIC -> println("Type error: Expected numeric type")
         else -> println("Syntax error")
     }
 }

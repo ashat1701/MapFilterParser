@@ -36,8 +36,32 @@ class ParserTest {
         val parsed = getExpression(state)
         assertEquals(parsed.type, NodeType.UNKNOWN)
     }
-    @Test
-    fun getExpressionInvalidType() {
+}
 
+class MiddlewareTest {
+    @Test
+    fun typeCheckCorrectFilter() {
+        val ast = getCall(ParserState("filter{(element>2)}", 0))
+        assertEquals(checkTypes(ast), true)
+    }
+    @Test
+    fun typeCheckIncorrectFilter() {
+        val ast = getCall(ParserState("filter{(element+2)}", 0))
+        assertEquals(checkTypes(ast), false)
+    }
+    @Test
+    fun typeCheckCorrectExpr() {
+        val ast = getExpression(ParserState("(((element+2)>3)|(1=2))", 0))
+        assertEquals(checkTypes(ast), true)
+    }
+    @Test
+    fun typeCheckIncorrectExpr() {
+        val ast = getExpression(ParserState("(((element+2)>3)|(element+2))", 0))
+        assertEquals(checkTypes(ast), false)
+    }
+    @Test
+    fun typeCheckIncorrectExprArith() {
+        val ast = getExpression(ParserState("(((element+(1>2))>3)|(element>12))", 0))
+        assertEquals(checkTypes(ast), false)
     }
 }

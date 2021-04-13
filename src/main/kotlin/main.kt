@@ -72,6 +72,7 @@ fun main() {
         for (call in calls) {
             val parser = ParserState(call, 0)
             val callAst = getCall(parser)
+            checkTypes(callAst)
             when (callAst.type) {
                 NodeType.FILTER -> {
                     filterExpr = if (filterExpr.type == NodeType.UNKNOWN) {
